@@ -43,68 +43,98 @@ var initialState = {
   forDeletion: undefined
 };
 
+function PostFeed$PostView(Props) {
+  var post = Props.post;
+  var description = Props.description;
+  var dispatch = Props.dispatch;
+  return React.createElement("div", {
+              className: "bg-green-700 hover:bg-green-900 text-gray-300 hover:text-gray-100 px-8 py-4 mb-4"
+            }, React.createElement("h2", {
+                  className: "text-2xl mb-1"
+                }, post.title), React.createElement("h3", {
+                  className: "mb-4"
+                }, post.author), description, React.createElement("button", {
+                  className: "mr-4 mt-4 bg-red-500 hover:bg-red-900 text-white py-2 px-4",
+                  onClick: (function (_mouseEvt) {
+                      return Curry._1(dispatch, {
+                                  TAG: /* DeleteLater */0,
+                                  _0: post,
+                                  _1: setTimeout((function (param) {
+                                          return Curry._1(dispatch, {
+                                                      TAG: /* DeleteNow */2,
+                                                      _0: post
+                                                    });
+                                        }), 10000)
+                                });
+                    })
+                }, "Remove this post"));
+}
+
+var PostView = {
+  make: PostFeed$PostView
+};
+
+function PostFeed$NotifyView(Props) {
+  var x = Props.x;
+  var handleRestore = Props.handleRestore;
+  var handleDeleteImmediately = Props.handleDeleteImmediately;
+  return React.createElement("div", {
+              className: "relative bg-yellow-100 px-8 py-4 mb-4 h-40"
+            }, React.createElement("p", {
+                  className: "text-center white mb-1"
+                }, "This post from " + Post.title(x) + " by " + Post.author(x) + " will be permanently removed in 10 seconds."), React.createElement("div", {
+                  className: "flex justify-center"
+                }, React.createElement("button", {
+                      className: "mr-4 mt-4 bg-yellow-500 hover:bg-yellow-900 text-white py-2 px-4",
+                      onClick: Curry.__1(handleRestore)
+                    }, "Restore"), React.createElement("button", {
+                      className: "mr-4 mt-4 bg-red-500 hover:bg-red-900 text-white py-2 px-4",
+                      onClick: Curry.__1(handleDeleteImmediately)
+                    }, "Delete Immediately")), React.createElement("div", {
+                  className: "bg-red-500 h-2 w-full absolute top-0 left-0 progress"
+                }));
+}
+
+var NotifyView = {
+  make: PostFeed$NotifyView
+};
+
 function PostFeed(Props) {
   var match = React.useReducer(reducer, initialState);
   var dispatch = match[1];
   var state = match[0];
   var posts = Belt_Array.map(state.posts, (function (x) {
           if (Belt_MapString.has(state.forDeletion, Post.id(x))) {
-            return React.createElement("div", {
-                        className: "relative bg-yellow-100 px-8 py-4 mb-4 h-40"
-                      }, React.createElement("p", {
-                            className: "text-center white mb-1"
-                          }, "This post from " + x.title + " by " + x.author + " will be permanently removed in 10 seconds."), React.createElement("div", {
-                            className: "flex justify-center"
-                          }, React.createElement("button", {
-                                className: "mr-4 mt-4 bg-yellow-500 hover:bg-yellow-900 text-white py-2 px-4",
-                                onClick: (function (_mouseEvt) {
-                                    clearTimeout(Belt_MapString.getExn(state.forDeletion, Post.id(x)));
-                                    return Curry._1(dispatch, {
-                                                TAG: /* DeleteAbort */1,
-                                                _0: x
-                                              });
-                                  })
-                              }, "Restore"), React.createElement("button", {
-                                className: "mr-4 mt-4 bg-red-500 hover:bg-red-900 text-white py-2 px-4",
-                                onClick: (function (_mouseEvt) {
-                                    clearTimeout(Belt_MapString.getExn(state.forDeletion, Post.id(x)));
-                                    return Curry._1(dispatch, {
-                                                TAG: /* DeleteNow */2,
-                                                _0: x
-                                              });
-                                  })
-                              }, "Delete Immediately")), React.createElement("div", {
-                            className: "bg-red-500 h-2 w-full absolute top-0 left-0 progress"
-                          }));
+            var handleRestore = function (_mouseEvt) {
+              clearTimeout(Belt_MapString.getExn(state.forDeletion, Post.id(x)));
+              return Curry._1(dispatch, {
+                          TAG: /* DeleteAbort */1,
+                          _0: x
+                        });
+            };
+            var handleDeleteImmediately = function (_mouseEvt) {
+              clearTimeout(Belt_MapString.getExn(state.forDeletion, Post.id(x)));
+              return Curry._1(dispatch, {
+                          TAG: /* DeleteNow */2,
+                          _0: x
+                        });
+            };
+            return React.createElement(PostFeed$NotifyView, {
+                        x: x,
+                        handleRestore: handleRestore,
+                        handleDeleteImmediately: handleDeleteImmediately
+                      });
           }
           var description = Belt_Array.map(x.text, (function (txt) {
                   return React.createElement("p", {
                               className: "mb-1 text-sm"
                             }, txt);
                 }));
-          return React.createElement("div", {
-                      className: "bg-green-700 hover:bg-green-900 text-gray-300 hover:text-gray-100 px-8 py-4 mb-4"
-                    }, React.createElement("h2", {
-                          className: "text-2xl mb-1"
-                        }, x.title), React.createElement("h3", {
-                          className: "mb-4"
-                        }, x.author), description, React.createElement("button", {
-                          className: "mr-4 mt-4 bg-red-500 hover:bg-red-900 text-white py-2 px-4",
-                          onClick: (function (_mouseEvt) {
-                              return Curry._1(dispatch, {
-                                          TAG: /* DeleteLater */0,
-                                          _0: x,
-                                          _1: setTimeout((function (param) {
-                                                  Curry._1(dispatch, {
-                                                        TAG: /* DeleteNow */2,
-                                                        _0: x
-                                                      });
-                                                  console.log("Time up");
-                                                  
-                                                }), 10000)
-                                        });
-                            })
-                        }, "Remove this post"));
+          return React.createElement(PostFeed$PostView, {
+                      post: x,
+                      description: description,
+                      dispatch: dispatch
+                    });
         }));
   return React.createElement("div", {
               className: "max-w-3xl mx-auto mt-8 relative"
@@ -118,6 +148,8 @@ export {
   arr ,
   reducer ,
   initialState ,
+  PostView ,
+  NotifyView ,
   make ,
   
 }
