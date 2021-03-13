@@ -1,0 +1,20 @@
+rescript = 1
+g_finger := /home/peeyush/rescript-react-ex1/node_modules/@rescript/react/lib/ocaml/install.stamp
+rule astj
+  command = /home/peeyush/rescript-react-ex1/node_modules/bs-platform/linux/bsc.exe  -warn-error +101 -bs-v 8.4.2 -bs-jsx 3  -absname -bs-ast -o $out $i
+o src/post.ast : astj ../../src/post.res
+rule deps
+  command = /home/peeyush/rescript-react-ex1/node_modules/bs-platform/linux/bsb_helper.exe -hash 2b29eb86ec00ab55a10720867af3d00c $in
+  restat = 1
+o src/post.d : deps src/post.ast
+rule mij
+  command = /home/peeyush/rescript-react-ex1/node_modules/bs-platform/linux/bsc.exe -I src -I /home/peeyush/rescript-react-ex1/node_modules/@rescript/react/lib/ocaml   -warn-error +101 -bs-package-name csef-rescript-react -bs-package-output es6:$in_d:.bs.js -bs-v $g_finger $i
+  dyndep = 1
+  restat = 1
+o src/post.cmj src/post.cmi ../../src/post.bs.js : mij src/post.ast
+o src/index.ast : astj ../../src/index.res
+o src/index.d : deps src/index.ast
+o src/index.cmj src/index.cmi ../../src/index.bs.js : mij src/index.ast
+o src/PostFeed.ast : astj ../../src/PostFeed.res
+o src/PostFeed.d : deps src/PostFeed.ast
+o src/PostFeed.cmj src/PostFeed.cmi ../../src/PostFeed.bs.js : mij src/PostFeed.ast

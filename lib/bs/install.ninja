@@ -1,0 +1,18 @@
+rescript = 1
+rule cp
+  command = cp $i $out
+rule touch
+ command = touch $out
+o post.cmi : cp ../bs/src/post.cmi
+o post.cmj : cp ../bs/src/post.cmj
+o post.cmt : cp ../bs/src/post.cmt
+o post.res : cp ../../src/post.res
+o index.cmi : cp ../bs/src/index.cmi
+o index.cmj : cp ../bs/src/index.cmj
+o index.cmt : cp ../bs/src/index.cmt
+o index.res : cp ../../src/index.res
+o PostFeed.cmi : cp ../bs/src/PostFeed.cmi
+o PostFeed.cmj : cp ../bs/src/PostFeed.cmj
+o PostFeed.cmt : cp ../bs/src/PostFeed.cmt
+o PostFeed.res : cp ../../src/PostFeed.res
+build install.stamp : touch post.cmi post.cmj index.cmi index.cmj PostFeed.cmi PostFeed.cmj 
